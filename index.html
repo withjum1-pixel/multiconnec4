@@ -4,67 +4,123 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>곱셈 사목 게임</title>
+<link href="https://fonts.googleapis.com/css2?family=Jua&family=Noto+Sans+KR:wght@400;700;900&display=swap" rel="stylesheet"/>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
-body{font-family:'Noto Sans KR','Malgun Gothic',sans-serif;background:#f5f3ff;min-height:100vh;}
+:root{--purple:#7c5cbf;--purple-dark:#5a3fa0;--purple-light:#f0ebff;--red:#cc0000;--blue:#0033cc;--bg:#f0ecfa;}
+body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);min-height:100vh;}
 #app{display:flex;flex-direction:column;align-items:center;padding:12px 8px;gap:12px;}
-
 .screen{width:100%;display:none;flex-direction:column;align-items:center;gap:12px;}
 .screen.active{display:flex;}
 
+/* ══ HOME ══ */
+#home-screen{
+  min-height:100vh;padding:0;gap:0;
+  background:linear-gradient(160deg,#130428 0%,#2d1260 38%,#6b2bab 72%,#b55ed4 100%);
+  position:relative;overflow:hidden;
+}
+.home-stars{position:absolute;inset:0;pointer-events:none;z-index:0;}
+.home-stars span{position:absolute;border-radius:50%;background:#fff;animation:twinkle 2.5s infinite alternate;}
+@keyframes twinkle{0%{opacity:.12;transform:scale(1);}100%{opacity:.95;transform:scale(1.5);}}
+.home-grid-deco{position:absolute;bottom:-10px;right:-10px;width:220px;height:220px;opacity:.06;pointer-events:none;background-image:radial-gradient(circle,#fff 1.5px,transparent 1.5px);background-size:20px 20px;z-index:0;}
+.home-orb{position:absolute;border-radius:50%;filter:blur(60px);pointer-events:none;z-index:0;}
+.home-orb-1{width:280px;height:280px;background:rgba(180,80,255,0.25);top:-60px;right:-80px;}
+.home-orb-2{width:200px;height:200px;background:rgba(80,120,255,0.2);bottom:80px;left:-60px;}
+
+.home-inner{position:relative;z-index:2;width:100%;max-width:460px;display:flex;flex-direction:column;align-items:center;padding:50px 22px 44px;}
+
+.home-badge{background:rgba(255,255,255,0.13);border:1px solid rgba(255,255,255,0.25);border-radius:100px;padding:6px 20px;font-size:13px;font-weight:700;color:rgba(255,255,255,0.88);letter-spacing:.07em;margin-bottom:22px;backdrop-filter:blur(10px);}
+.home-icon-wrap{width:108px;height:108px;border-radius:28px;background:linear-gradient(135deg,rgba(255,255,255,0.28),rgba(255,255,255,0.05));border:2px solid rgba(255,255,255,0.28);display:flex;align-items:center;justify-content:center;font-size:60px;margin-bottom:22px;box-shadow:0 10px 44px rgba(0,0,0,0.4),inset 0 1px 0 rgba(255,255,255,0.3);animation:floatIcon 3.6s ease-in-out infinite;}
+@keyframes floatIcon{0%,100%{transform:translateY(0) rotate(-2deg);}50%{transform:translateY(-9px) rotate(2deg);}}
+.home-title{font-family:'Jua',sans-serif;font-size:48px;color:#fff;text-align:center;line-height:1.1;margin-bottom:8px;text-shadow:0 3px 24px rgba(0,0,0,0.5);}
+.home-title span{color:#f9d94e;text-shadow:0 0 30px rgba(249,217,78,0.6);}
+.home-sub{font-size:15px;color:rgba(255,255,255,0.65);text-align:center;line-height:1.85;margin-bottom:20px;}
+
+.home-divider{width:100%;height:1px;background:rgba(255,255,255,0.12);margin:4px 0 18px;}
+.home-sec-label{font-size:12px;font-weight:700;color:rgba(255,255,255,0.45);letter-spacing:.1em;text-transform:uppercase;align-self:flex-start;margin-bottom:9px;}
+
+/* mode cards */
+.home-mode-row{display:flex;gap:10px;width:100%;margin-bottom:16px;}
+.home-mode-card{flex:1;border-radius:14px;padding:14px 10px;cursor:pointer;border:2px solid rgba(255,255,255,0.14);background:rgba(255,255,255,0.07);text-align:center;transition:all .2s;backdrop-filter:blur(8px);}
+.home-mode-card:hover{background:rgba(255,255,255,0.16);transform:translateY(-2px);}
+.home-mode-card.selected{border-color:#f9d94e;background:rgba(249,217,78,0.16);box-shadow:0 0 0 3px rgba(249,217,78,0.22);}
+.home-mode-card .hmi{font-size:28px;}.home-mode-card .hmn{font-size:17px;font-weight:800;color:#fff;margin-top:5px;}.home-mode-card .hmd{font-size:13px;color:rgba(255,255,255,0.55);margin-top:2px;}
+
+/* names */
+.home-names-row{display:flex;gap:10px;width:100%;margin-bottom:16px;}
+.home-name-box{flex:1;border-radius:12px;padding:11px 13px;border:2px solid rgba(255,255,255,0.14);background:rgba(255,255,255,0.07);backdrop-filter:blur(8px);}
+.home-name-box label{font-size:13px;font-weight:700;display:block;margin-bottom:4px;}
+.home-name-box.hn1 label{color:#f48080;}.home-name-box.hn2 label{color:#7aaff5;}
+.home-name-box input{font-size:17px;font-weight:700;border:none;outline:none;background:transparent;color:#fff;width:100%;}
+.home-name-box input::placeholder{color:rgba(255,255,255,0.28);font-weight:400;}
+
+/* timer */
+.home-timer-row{display:flex;gap:7px;width:100%;flex-wrap:wrap;margin-bottom:16px;}
+.home-timer-opt{flex:1;min-width:56px;border-radius:10px;padding:10px 5px;cursor:pointer;border:2px solid rgba(255,255,255,0.14);background:rgba(255,255,255,0.07);text-align:center;transition:all .15s;backdrop-filter:blur(4px);}
+.home-timer-opt:hover{background:rgba(255,255,255,0.17);}
+.home-timer-opt.selected{border-color:#f9d94e;background:rgba(249,217,78,0.16);box-shadow:0 0 0 2px rgba(249,217,78,0.22);}
+.home-timer-opt .hte{font-size:19px;}.home-timer-opt .htv{font-size:13px;font-weight:800;color:#fff;margin-top:2px;}
+
+/* first-turn */
+.home-ft-row{display:flex;gap:8px;width:100%;margin-bottom:22px;}
+.home-ft-card{flex:1;border-radius:12px;padding:12px 7px;cursor:pointer;border:2px solid rgba(255,255,255,0.14);background:rgba(255,255,255,0.07);text-align:center;transition:all .15s;backdrop-filter:blur(6px);}
+.home-ft-card:hover{background:rgba(255,255,255,0.17);}
+.home-ft-card.selected{border-color:#f9d94e;background:rgba(249,217,78,0.16);box-shadow:0 0 0 2px rgba(249,217,78,0.22);}
+.home-ft-card .hfi{font-size:22px;}.home-ft-card .hfn{font-size:13px;font-weight:800;color:#fff;margin-top:3px;}
+
+.home-start-btn{width:100%;padding:18px 0;font-size:21px;font-weight:800;border-radius:16px;cursor:pointer;border:none;background:linear-gradient(135deg,#f9d94e 0%,#f0a030 100%);color:#1a0533;box-shadow:0 8px 32px rgba(249,217,78,0.5);transition:transform .15s,box-shadow .15s;font-family:'Jua',sans-serif;letter-spacing:.03em;margin-bottom:10px;}
+.home-start-btn:hover{transform:scale(1.03);box-shadow:0 12px 40px rgba(249,217,78,0.65);}
+.home-advanced-link{text-align:center;font-size:13px;color:rgba(255,255,255,0.4);cursor:pointer;text-decoration:underline;}
+.home-advanced-link:hover{color:rgba(255,255,255,0.7);}
+.home-feature-box{width:100%;background:rgba(255,255,255,0.09);border:1px solid rgba(255,255,255,0.14);border-radius:16px;padding:16px 20px;backdrop-filter:blur(8px);margin-top:4px;}
+.home-feat{font-size:14px;color:rgba(255,255,255,0.75);padding:4px 0;line-height:1.6;}
+
+/* ══ SETUP ══ */
 .nav-bar{display:flex;align-items:center;gap:8px;width:100%;max-width:660px;margin-bottom:2px;}
 .nav-btn{display:flex;align-items:center;gap:5px;padding:7px 14px;border-radius:10px;border:1.5px solid #ccc;background:#fff;color:#555;font-size:14px;font-weight:700;cursor:pointer;transition:all .15s;}
 .nav-btn:hover{background:#f0f0f0;color:#222;}
-.nav-spacer{flex:1;}
-.nav-title{font-size:15px;font-weight:800;color:#222;}
-
+.nav-spacer{flex:1;}.nav-title{font-size:15px;font-weight:800;color:#222;}
 .mode-row{display:flex;gap:12px;width:100%;max-width:660px;}
-.mode-card{flex:1;border-radius:12px;padding:14px 10px;cursor:pointer;border:2px solid #ddd;text-align:center;background:#fff;transition:all 0.15s;}
+.mode-card{flex:1;border-radius:12px;padding:14px 10px;cursor:pointer;border:2px solid #ddd;text-align:center;background:#fff;transition:all .15s;}
 .mode-card:hover{transform:scale(1.03);}
 .mode-card.selected{border-color:#7c5cbf;box-shadow:0 0 0 3px rgba(124,92,191,0.18);}
-.mode-card .mi{font-size:31px;}.mode-card .mn{font-size:17px;font-weight:800;margin:4px 0 2px;}.mode-card .md{font-size:14px;color:#888;}
-
+.mode-card .mi{font-size:33px;}.mode-card .mn{font-size:19px;font-weight:800;margin:4px 0 2px;}.mode-card .md{font-size:16px;color:#888;}
 .name-row{display:flex;gap:12px;width:100%;max-width:660px;}
 .name-box{flex:1;background:#fff;border:1px solid #ddd;border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:6px;}
-.name-box label{font-size:14px;font-weight:700;}
+.name-box label{font-size:16px;font-weight:700;}
 .name-box.p1 label{color:#c0392b;}.name-box.p2 label{color:#1a5fb4;}
 .name-box input{font-size:18px;font-weight:600;border:none;outline:none;background:transparent;color:#222;width:100%;}
 .name-box input::placeholder{color:#aaa;font-weight:400;}
-
-.level-sec-title{font-size:16px;font-weight:700;color:#666;align-self:flex-start;max-width:660px;width:100%;}
+.level-sec-title{font-size:18px;font-weight:700;color:#555;align-self:flex-start;max-width:660px;width:100%;}
 .level-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;width:100%;max-width:660px;}
-.level-card{border-radius:10px;padding:10px 8px;cursor:pointer;border:2px solid #ddd;text-align:center;transition:all 0.15s;background:#fff;}
+.level-card{border-radius:10px;padding:10px 8px;cursor:pointer;border:2px solid #ddd;text-align:center;transition:all .15s;background:#fff;}
 .level-card:hover{transform:scale(1.04);}
 .level-card.selected{border-color:#7c5cbf;box-shadow:0 0 0 3px rgba(124,92,191,0.18);}
-.level-card .badge-icon{font-size:27px;}.level-card .badge-name{font-size:15px;font-weight:800;margin:3px 0 2px;}.level-card .badge-desc{font-size:12px;color:#888;line-height:1.4;}.level-card .badge-ex{font-size:12px;font-weight:600;margin-top:3px;padding:2px 6px;border-radius:20px;display:inline-block;}
-
+.level-card .badge-icon{font-size:29px;}.level-card .badge-name{font-size:17px;font-weight:800;margin:3px 0 2px;}.level-card .badge-desc{font-size:14px;color:#888;line-height:1.4;}.level-card .badge-ex{font-size:14px;font-weight:600;margin-top:3px;padding:2px 6px;border-radius:20px;display:inline-block;}
 .start-btn{padding:14px 0;font-size:19px;font-weight:800;border-radius:12px;cursor:pointer;border:none;background:linear-gradient(135deg,#7c5cbf,#5a3fa0);color:white;width:100%;max-width:660px;transition:transform .15s,opacity .15s;}
 .start-btn:hover{transform:scale(1.02);opacity:.93;}
-
-.timer-select-row{display:flex;gap:8px;flex-wrap:wrap;width:100%;max-width:660px;align-items:center;}
-.timer-option{flex:1;min-width:60px;border-radius:10px;padding:10px 6px;cursor:pointer;border:2px solid #ddd;text-align:center;transition:all 0.15s;background:#fff;font-size:14px;font-weight:700;color:#555;}
+.timer-select-row{display:flex;gap:8px;flex-wrap:wrap;width:100%;max-width:660px;}
+.timer-option{flex:1;min-width:60px;border-radius:10px;padding:10px 6px;cursor:pointer;border:2px solid #ddd;text-align:center;transition:all .15s;background:#fff;color:#555;}
 .timer-option:hover{transform:scale(1.04);}
 .timer-option.selected{border-color:#7c5cbf;background:#f0ebff;color:#5a3fa0;box-shadow:0 0 0 3px rgba(124,92,191,0.18);}
-.timer-option .ti{font-size:20px;}.timer-option .tv{font-size:13px;font-weight:800;margin-top:2px;}.timer-option .ts{font-size:11px;color:#aaa;}
-
+.timer-option .ti{font-size:22px;}.timer-option .tv{font-size:15px;font-weight:800;margin-top:2px;}
 .first-turn-row{display:flex;gap:10px;width:100%;max-width:660px;}
-.first-turn-card{flex:1;border-radius:12px;padding:12px 8px;cursor:pointer;border:2px solid #ddd;text-align:center;background:#fff;transition:all 0.15s;}
+.first-turn-card{flex:1;border-radius:12px;padding:13px 8px;cursor:pointer;border:2px solid #ddd;text-align:center;background:#fff;transition:all .15s;}
 .first-turn-card:hover{transform:scale(1.03);}
 .first-turn-card.selected{border-color:#7c5cbf;box-shadow:0 0 0 3px rgba(124,92,191,0.18);}
-.first-turn-card .fti{font-size:26px;}.first-turn-card .ftn{font-size:13px;font-weight:800;margin-top:3px;}
+.first-turn-card .fti{font-size:28px;}.first-turn-card .ftn{font-size:15px;font-weight:800;margin-top:3px;}
 
+/* ══ GAME ══ */
 #scoreboard{display:flex;gap:10px;width:100%;max-width:660px;align-items:center;}
 .player-card{flex:1;border-radius:12px;padding:10px;display:flex;flex-direction:column;align-items:center;border:4px solid transparent;transition:all .2s;}
-.player-card.p1{background:#fce8e8;color:#9b2222;}
-.player-card.p2{background:#e8f0fc;color:#1a3f7a;}
+.player-card.p1{background:#fce8e8;color:#9b2222;}.player-card.p2{background:#e8f0fc;color:#1a3f7a;}
 .player-card.active.p1{border:4px solid #cc0000;box-shadow:0 0 0 3px rgba(200,0,0,0.18);transform:scale(1.06);}
 .player-card.active.p2{border:4px solid #0033cc;box-shadow:0 0 0 3px rgba(0,50,200,0.18);transform:scale(1.06);}
-.player-card .pname{font-size:15px;font-weight:800;}.player-card .stone{font-size:21px;}
+.player-card .pname{font-size:17px;font-weight:800;}.player-card .stone{font-size:23px;}
 .stat-mini{display:flex;flex-direction:column;align-items:center;gap:1px;}
-.stat-mini .si{font-size:11px;color:#888;}.stat-mini .sv{font-size:14px;font-weight:700;color:#222;}
-.player-card .turn-label{font-size:12px;font-weight:700;padding:3px 9px;border-radius:20px;background:currentColor;color:white;opacity:0;transition:opacity .2s;margin-top:2px;}
+.stat-mini .si{font-size:13px;color:#888;}.stat-mini .sv{font-size:16px;font-weight:700;color:#222;}
+.player-card .turn-label{font-size:14px;font-weight:700;padding:3px 9px;border-radius:20px;background:currentColor;color:white;opacity:0;transition:opacity .2s;margin-top:2px;}
 .player-card.active .turn-label{opacity:1;}
-
 .timer-wrap{display:flex;flex-direction:column;align-items:center;gap:3px;}
 .timer-ring-wrap{position:relative;width:58px;height:58px;}
 .timer-ring-wrap svg{transform:rotate(-90deg);}
@@ -72,49 +128,40 @@ body{font-family:'Noto Sans KR','Malgun Gothic',sans-serif;background:#f5f3ff;mi
 #timer-circle{fill:none;stroke:#7c5cbf;stroke-width:5;stroke-linecap:round;stroke-dasharray:150.8;stroke-dashoffset:0;transition:stroke-dashoffset 1s linear,stroke .3s;}
 #timer-num{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:800;color:#222;}
 .timer-label{font-size:12px;font-weight:700;color:#888;}
-.timer-ring-wrap.danger #timer-circle{stroke:#e85d5d;}
-.timer-ring-wrap.danger #timer-num{color:#e85d5d;}
+.timer-ring-wrap.danger #timer-circle{stroke:#e85d5d;}.timer-ring-wrap.danger #timer-num{color:#e85d5d;}
 @keyframes shake{0%,100%{transform:translateX(0);}25%{transform:translateX(-4px);}75%{transform:translateX(4px);}}
 .timer-ring-wrap.shake{animation:shake .3s ease;}
 .level-badge-mini{text-align:center;margin-top:2px;}.level-badge-mini .bi{font-size:18px;}.level-badge-mini .bn{font-size:12px;font-weight:700;color:#888;}
-
 #board-wrap{background:#7c5cbf;border-radius:14px;padding:9px;box-shadow:0 4px 20px rgba(0,0,0,.18);}
 #board{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;}
 .cell{width:108px;height:74px;background:#f0ebe8;border-radius:8px;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;transition:background .15s,transform .1s;user-select:none;}
 .cell:hover:not(.taken){background:#fffde0;transform:scale(1.04);}
 .cell.taken{cursor:default;}
-.cell .problem{font-size:18px;font-weight:700;color:#333;}
-.cell.taken .problem{font-size:13px;color:#999;font-weight:400;}
+.cell .problem{font-size:20px;font-weight:700;color:#333;}.cell.taken .problem{font-size:15px;color:#999;font-weight:400;}
 .cell .stone-piece{width:40px;height:40px;border-radius:50%;display:none;align-items:center;justify-content:center;}
 .cell.p1 .stone-piece{display:flex;background:radial-gradient(circle at 35% 35%,#f48080,#e85d5d);}
 .cell.p2 .stone-piece{display:flex;background:radial-gradient(circle at 35% 35%,#7aaff5,#4a7fdb);}
 .cell.win-cell{box-shadow:0 0 0 4px #f5a623;background:#fffbe0 !important;}
-.cell.ai-thinking{background:#e8e0ff !important;}
-.cell.timeout-flash{background:#ffe0e0 !important;}
-
+.cell.ai-thinking{background:#e8e0ff !important;}.cell.timeout-flash{background:#ffe0e0 !important;}
 #answer-panel{background:#fff;border:1px solid #eee;border-radius:12px;padding:12px 16px;width:100%;max-width:660px;display:flex;flex-direction:column;gap:8px;}
-#selected-problem{font-size:16px;color:#888;min-height:22px;}
-#selected-problem strong{color:#222;font-size:22px;}
+#selected-problem{font-size:16px;color:#888;min-height:22px;}#selected-problem strong{color:#222;font-size:22px;}
 .input-row{display:flex;gap:8px;align-items:center;}
 #answer-input{flex:1;font-size:22px;font-weight:700;text-align:center;border-radius:8px;padding:8px;max-width:150px;border:2px solid #ccc;}
 #submit-btn{padding:9px 18px;font-size:17px;font-weight:700;border-radius:8px;cursor:pointer;background:#5a4ab0;color:white;border:none;transition:background .15s;}
 #submit-btn:hover{background:#4a3a9a;}
 #feedback{font-size:15px;font-weight:600;min-height:18px;}
 #feedback.ok{color:#2a8a40;}#feedback.err{color:#c0392b;}#feedback.ai{color:#7c5cbf;}#feedback.timeout{color:#e85d5d;}
-
 #turn-popup{position:fixed;bottom:0;left:0;right:0;display:flex;align-items:center;justify-content:center;padding:18px 20px;z-index:200;transform:translateY(100%);transition:transform .35s cubic-bezier(.175,.885,.32,1.275);pointer-events:none;}
 #turn-popup.show{transform:translateY(0);}
-#turn-popup-inner{display:flex;align-items:center;gap:14px;border-radius:20px;padding:16px 32px;box-shadow:0 -4px 32px rgba(0,0,0,0.22);min-width:260px;justify-content:center;}
-#turn-popup-inner.p1-style{background:#cc0000;}
-#turn-popup-inner.p2-style{background:#0033cc;}
+#turn-popup-inner{display:flex;align-items:center;gap:14px;border-radius:20px;padding:16px 32px;box-shadow:0 -4px 32px rgba(0,0,0,.22);min-width:260px;justify-content:center;}
+#turn-popup-inner.p1-style{background:#cc0000;}#turn-popup-inner.p2-style{background:#0033cc;}
 #turn-popup-stone{font-size:36px;line-height:1;}
-#turn-popup-label{font-size:14px;font-weight:600;color:rgba(255,255,255,0.8);}
+#turn-popup-label{font-size:14px;font-weight:600;color:rgba(255,255,255,.8);}
 #turn-popup-name{font-size:26px;font-weight:800;color:white;line-height:1.1;}
-
-#result-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.65);z-index:100;align-items:center;justify-content:center;}
+#result-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:100;align-items:center;justify-content:center;}
 #result-overlay.show{display:flex;}
 #result-box{background:#fff;border-radius:24px;padding:36px 44px;text-align:center;max-width:360px;animation:popIn .4s cubic-bezier(.175,.885,.32,1.275);}
-@keyframes popIn{from{transform:scale(0.7);opacity:0;}to{transform:scale(1);opacity:1;}}
+@keyframes popIn{from{transform:scale(.7);opacity:0;}to{transform:scale(1);opacity:1;}}
 .result-badge-big{font-size:64px;line-height:1;margin-bottom:4px;}
 #result-title{font-size:30px;font-weight:800;margin:8px 0 4px;color:#222;}
 #result-desc{color:#888;font-size:15px;margin-bottom:8px;}
@@ -122,51 +169,52 @@ body{font-family:'Noto Sans KR','Malgun Gothic',sans-serif;background:#f5f3ff;mi
 .stat-item .sl{font-size:12px;color:#888;}.stat-item .sv{font-size:20px;font-weight:800;color:#222;}
 .result-btns{display:flex;gap:10px;justify-content:center;margin-top:16px;flex-wrap:wrap;}
 .result-btns button{padding:11px 20px;font-size:15px;font-weight:700;border-radius:12px;cursor:pointer;border:none;}
-#restart-btn{background:#5a4ab0;color:white;}
-#result-menu-btn{background:#eee;color:#222;border:1px solid #ccc;}
-#result-home-btn{background:#7c5cbf;color:white;}
-
-#confirm-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:300;align-items:center;justify-content:center;}
+#restart-btn{background:#5a4ab0;color:white;}#result-menu-btn{background:#eee;color:#222;border:1px solid #ccc;}#result-home-btn{background:#7c5cbf;color:white;}
+#confirm-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:300;align-items:center;justify-content:center;}
 #confirm-overlay.show{display:flex;}
-#confirm-box{background:#fff;border-radius:18px;padding:28px 32px;text-align:center;max-width:300px;box-shadow:0 8px 32px rgba(0,0,0,0.25);}
+#confirm-box{background:#fff;border-radius:18px;padding:28px 32px;text-align:center;max-width:300px;box-shadow:0 8px 32px rgba(0,0,0,.25);}
 #confirm-box .ci{font-size:40px;margin-bottom:8px;}
 #confirm-box h3{font-size:18px;font-weight:800;margin-bottom:6px;color:#222;}
 #confirm-box p{font-size:14px;color:#888;margin-bottom:18px;}
 .confirm-btns{display:flex;gap:10px;justify-content:center;}
 .confirm-btns button{padding:10px 22px;font-size:14px;font-weight:700;border-radius:10px;cursor:pointer;border:none;}
-#confirm-ok{background:#cc0000;color:white;}
-#confirm-cancel{background:#eee;color:#222;border:1px solid #ccc;}
-
+#confirm-ok{background:#cc0000;color:white;}#confirm-cancel{background:#eee;color:#222;border:1px solid #ccc;}
 #confetti-canvas{position:fixed;inset:0;pointer-events:none;z-index:99;}
 </style>
 </head>
 <body>
-
 <canvas id="confetti-canvas"></canvas>
-
 <div id="app">
 
-<!-- HOME -->
-<div id="home-screen" class="screen active" style="gap:20px;padding:30px 0;max-width:660px;">
-  <div style="font-size:52px;line-height:1;">🎯</div>
-  <div style="font-size:28px;font-weight:800;color:#222;text-align:center;">곱셈 <span style="color:#7c5cbf;">사목</span> 게임</div>
-  <div style="font-size:15px;color:#888;text-align:center;line-height:1.7;">정답을 맞히고 바둑돌을 놓아<br>먼저 4개를 이어 연결하세요!</div>
-  <button class="start-btn" style="max-width:320px;font-size:20px;padding:16px 0;" onclick="showScreen('setup')">게임 시작하기 🎮</button>
-  <div style="background:#ede9f7;border-radius:12px;padding:14px 18px;font-size:14px;color:#555;line-height:1.9;width:100%;max-width:320px;">
-    ✅ 1인 모드 (vs 컴퓨터)<br>
-    ✅ 2인 모드 (친구와 대결)<br>
-    ✅ 6단계 난이도<br>
-    ✅ 제한 시간 선택 (10초~90초)
+<!-- ══ HOME ══ -->
+<div id="home-screen" class="screen active">
+  <div class="home-stars" id="home-stars"></div>
+  <div class="home-orb home-orb-1"></div>
+  <div class="home-orb home-orb-2"></div>
+  <div class="home-grid-deco"></div>
+  <div class="home-inner">
+    <div class="home-badge">✨ 초등 수학 게임</div>
+    <div class="home-icon-wrap">🎯</div>
+    <div class="home-title">곱셈 <span>사목</span></div>
+    <div class="home-sub">정답을 맞히고 바둑돌을 놓아<br>먼저 4개를 연결하면 승리! 🏆</div>
+    <div class="home-divider"></div>
+    <div class="home-sec-label">🎯 선공 선택</div>
+    <div class="home-ft-row" id="home-ft-row"></div>
+    <button class="home-start-btn" onclick="showScreen('setup')">게임 시작하기 🎮</button>
+    <div class="home-feature-box">
+      <div class="home-feat">✅ 1인 모드 (vs 컴퓨터)</div>
+      <div class="home-feat">✅ 2인 모드 (친구와 대결)</div>
+      <div class="home-feat">✅ 6단계 난이도</div>
+      <div class="home-feat">✅ 제한 시간 선택 (10초~90초)</div>
+    </div>
   </div>
 </div>
 
-<!-- SETUP -->
+<!-- ══ SETUP ══ -->
 <div id="setup-screen" class="screen" style="gap:14px;max-width:660px;">
   <div class="nav-bar">
     <button class="nav-btn" onclick="showScreen('home')">← 이전</button>
-    <div class="nav-spacer"></div>
-    <div class="nav-title">게임 설정</div>
-    <div class="nav-spacer"></div>
+    <div class="nav-spacer"></div><div class="nav-title">게임 설정</div><div class="nav-spacer"></div>
     <button class="nav-btn" onclick="showScreen('home')">🏠 홈</button>
   </div>
   <div class="mode-row">
@@ -181,24 +229,19 @@ body{font-family:'Noto Sans KR','Malgun Gothic',sans-serif;background:#f5f3ff;mi
   <div class="level-grid" id="level-grid"></div>
   <div class="level-sec-title">⏱️ 제한 시간 선택</div>
   <div class="timer-select-row" id="timer-select-row"></div>
-  <div class="level-sec-title" id="first-turn-label">🎯 선공 선택</div>
-  <div class="first-turn-row" id="first-turn-row"></div>
   <button class="start-btn" onclick="startGame()">게임 시작! 🎮</button>
 </div>
 
-<!-- GAME -->
+<!-- ══ GAME ══ -->
 <div id="game-screen" class="screen" style="gap:10px;">
   <div class="nav-bar">
     <button class="nav-btn" onclick="askLeave('setup')">← 설정</button>
-    <div class="nav-spacer"></div>
-    <div class="nav-title" id="game-nav-title">게임 중</div>
-    <div class="nav-spacer"></div>
+    <div class="nav-spacer"></div><div class="nav-title" id="game-nav-title">게임 중</div><div class="nav-spacer"></div>
     <button class="nav-btn" onclick="askLeave('home')">🏠 홈</button>
   </div>
   <div id="scoreboard">
     <div class="player-card p1 active" id="card1">
-      <div class="pname" id="display-name1">플레이어1</div>
-      <div class="stone">🔴</div>
+      <div class="pname" id="display-name1">플레이어1</div><div class="stone">🔴</div>
       <div style="display:flex;gap:8px;margin-top:3px;">
         <div class="stat-mini"><div class="si">정답</div><div class="sv" id="s1-ok">0</div></div>
         <div class="stat-mini"><div class="si">오답</div><div class="sv" id="s1-err">0</div></div>
@@ -217,8 +260,7 @@ body{font-family:'Noto Sans KR','Malgun Gothic',sans-serif;background:#f5f3ff;mi
       <div class="level-badge-mini"><div class="bi" id="mini-icon">⭐</div><div class="bn" id="mini-name"></div></div>
     </div>
     <div class="player-card p2" id="card2">
-      <div class="pname" id="display-name2">플레이어2</div>
-      <div class="stone" id="p2-stone">🔵</div>
+      <div class="pname" id="display-name2">플레이어2</div><div class="stone" id="p2-stone">🔵</div>
       <div style="display:flex;gap:8px;margin-top:3px;">
         <div class="stat-mini"><div class="si">정답</div><div class="sv" id="s2-ok">0</div></div>
         <div class="stat-mini"><div class="si">오답</div><div class="sv" id="s2-err">0</div></div>
@@ -236,17 +278,13 @@ body{font-family:'Noto Sans KR','Malgun Gothic',sans-serif;background:#f5f3ff;mi
     <div id="feedback"></div>
   </div>
 </div>
-
-</div><!-- end #app -->
+</div>
 
 <!-- TURN POPUP -->
 <div id="turn-popup">
   <div id="turn-popup-inner" class="p1-style">
     <div id="turn-popup-stone">🔴</div>
-    <div>
-      <div id="turn-popup-label">차례입니다!</div>
-      <div id="turn-popup-name">플레이어1</div>
-    </div>
+    <div><div id="turn-popup-label">차례입니다!</div><div id="turn-popup-name">플레이어1</div></div>
   </div>
 </div>
 
@@ -254,8 +292,7 @@ body{font-family:'Noto Sans KR','Malgun Gothic',sans-serif;background:#f5f3ff;mi
 <div id="result-overlay">
   <div id="result-box">
     <div class="result-badge-big" id="result-emoji">🏆</div>
-    <div id="result-title"></div>
-    <p id="result-desc"></p>
+    <div id="result-title"></div><p id="result-desc"></p>
     <div class="stat-box">
       <div class="stat-item"><div class="sl" id="sl1"></div><div class="sv" id="sv1"></div></div>
       <div class="stat-item"><div class="sl" id="sl2"></div><div class="sv" id="sv2"></div></div>
@@ -282,257 +319,146 @@ body{font-family:'Noto Sans KR','Malgun Gothic',sans-serif;background:#f5f3ff;mi
 </div>
 
 <script>
-let TIMER_MAX = 40;
-const CIRCUMFERENCE = 2 * Math.PI * 24;
-let selectedTimer = 40;
-let selectedFirstTurn = 'p1'; // 'p1' | 'p2' | 'random'
+/* ── STARS ── */
+(function(){
+  const wrap=document.getElementById('home-stars');
+  for(let i=0;i<60;i++){
+    const s=document.createElement('span');
+    const sz=.8+Math.random()*2.8;
+    s.style.cssText=`width:${sz}px;height:${sz}px;top:${Math.random()*100}%;left:${Math.random()*100}%;animation-delay:${Math.random()*3}s;animation-duration:${1.6+Math.random()*2.4}s;`;
+    wrap.appendChild(s);
+  }
+})();
 
 /* ── CONFETTI ── */
-const canvas = document.getElementById('confetti-canvas');
-const ctx = canvas.getContext('2d');
-let confettiPieces = [], confettiRunning = false, confettiFrame = null;
-function resizeCanvas(){ canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
-window.addEventListener('resize', resizeCanvas); resizeCanvas();
+const canvas=document.getElementById('confetti-canvas');
+const ctx=canvas.getContext('2d');
+let confettiPieces=[],confettiRunning=false,confettiFrame=null;
+function resizeCanvas(){canvas.width=window.innerWidth;canvas.height=window.innerHeight;}
+window.addEventListener('resize',resizeCanvas);resizeCanvas();
 function launchConfetti(){
-  resizeCanvas(); confettiPieces = [];
-  const colors = ['#e85d5d','#4a7fdb','#f5a623','#7c5cbf','#2a8a40','#f9a825','#e91e63','#00bcd4'];
-  for(let i = 0; i < 160; i++){
-    confettiPieces.push({x:Math.random()*canvas.width, y:-10-Math.random()*canvas.height*0.3,
-      w:8+Math.random()*8, h:5+Math.random()*5,
-      color:colors[Math.floor(Math.random()*colors.length)],
-      rot:Math.random()*360, vx:(Math.random()-0.5)*4, vy:3+Math.random()*5,
-      vr:(Math.random()-0.5)*8, opacity:1});
-  }
-  confettiRunning = true;
-  if(confettiFrame) cancelAnimationFrame(confettiFrame);
-  animateConfetti();
+  resizeCanvas();confettiPieces=[];
+  const colors=['#e85d5d','#4a7fdb','#f5a623','#7c5cbf','#2a8a40','#f9d94e','#e91e63','#00bcd4'];
+  for(let i=0;i<160;i++) confettiPieces.push({x:Math.random()*canvas.width,y:-10-Math.random()*canvas.height*.3,w:8+Math.random()*8,h:5+Math.random()*5,color:colors[Math.floor(Math.random()*colors.length)],rot:Math.random()*360,vx:(Math.random()-.5)*4,vy:3+Math.random()*5,vr:(Math.random()-.5)*8,opacity:1});
+  confettiRunning=true;if(confettiFrame) cancelAnimationFrame(confettiFrame);animateConfetti();
 }
 function animateConfetti(){
   if(!confettiRunning) return;
   ctx.clearRect(0,0,canvas.width,canvas.height);
-  confettiPieces.forEach(p=>{
-    p.x+=p.vx; p.y+=p.vy; p.rot+=p.vr; p.vy+=0.07;
-    if(p.y > canvas.height*0.7) p.opacity -= 0.025;
-    if(p.opacity <= 0) return;
-    ctx.save(); ctx.globalAlpha = Math.max(0,p.opacity);
-    ctx.translate(p.x,p.y); ctx.rotate(p.rot*Math.PI/180);
-    ctx.fillStyle = p.color; ctx.fillRect(-p.w/2,-p.h/2,p.w,p.h);
-    ctx.restore();
-  });
-  confettiPieces = confettiPieces.filter(p=>p.opacity>0);
-  if(confettiPieces.length > 0){ confettiFrame = requestAnimationFrame(animateConfetti); }
-  else { confettiRunning = false; ctx.clearRect(0,0,canvas.width,canvas.height); }
+  confettiPieces.forEach(p=>{p.x+=p.vx;p.y+=p.vy;p.rot+=p.vr;p.vy+=.07;if(p.y>canvas.height*.7) p.opacity-=.025;if(p.opacity<=0) return;ctx.save();ctx.globalAlpha=Math.max(0,p.opacity);ctx.translate(p.x,p.y);ctx.rotate(p.rot*Math.PI/180);ctx.fillStyle=p.color;ctx.fillRect(-p.w/2,-p.h/2,p.w,p.h);ctx.restore();});
+  confettiPieces=confettiPieces.filter(p=>p.opacity>0);
+  if(confettiPieces.length>0){confettiFrame=requestAnimationFrame(animateConfetti);}else{confettiRunning=false;ctx.clearRect(0,0,canvas.width,canvas.height);}
 }
-function stopConfetti(){ confettiRunning = false; if(confettiFrame) cancelAnimationFrame(confettiFrame); ctx.clearRect(0,0,canvas.width,canvas.height); }
+function stopConfetti(){confettiRunning=false;if(confettiFrame) cancelAnimationFrame(confettiFrame);ctx.clearRect(0,0,canvas.width,canvas.height);}
 
-/* ── SCREEN NAVIGATION ── */
+/* ── NAV ── */
 function showScreen(name){
-  // name: 'home' | 'setup' | 'game'
-  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-  document.getElementById(name + '-screen').classList.add('active');
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById(name+'-screen').classList.add('active');
+  document.getElementById('app').style.padding=name==='home'?'0':'12px 8px';
 }
-
-let confirmTarget = null;
-function askLeave(target){
-  confirmTarget = target;
-  document.getElementById('confirm-title').textContent = target === 'home' ? '홈으로 이동할까요?' : '설정으로 돌아갈까요?';
-  document.getElementById('confirm-overlay').classList.add('show');
-}
-function closeConfirm(){
-  document.getElementById('confirm-overlay').classList.remove('show');
-  confirmTarget = null;
-}
-function confirmOk(){
-  const t = confirmTarget;
-  closeConfirm();
-  stopTimer(); stopConfetti();
-  document.getElementById('turn-popup').classList.remove('show');
-  showScreen(t);
-}
-function resultNav(target){
-  document.getElementById('result-overlay').classList.remove('show');
-  stopConfetti();
-  showScreen(target);
-}
+let confirmTarget=null;
+function askLeave(target){confirmTarget=target;document.getElementById('confirm-title').textContent=target==='home'?'홈으로 이동할까요?':'설정으로 돌아갈까요?';document.getElementById('confirm-overlay').classList.add('show');}
+function closeConfirm(){document.getElementById('confirm-overlay').classList.remove('show');confirmTarget=null;}
+function confirmOk(){const t=confirmTarget;closeConfirm();stopTimer();stopConfetti();document.getElementById('turn-popup').classList.remove('show');showScreen(t);}
+function resultNav(target){document.getElementById('result-overlay').classList.remove('show');stopConfetti();showScreen(target);}
 
 /* ── TURN POPUP ── */
-let turnPopupTimer = null;
+let turnPopupTimer=null;
 function showTurnPopup(player){
   clearTimeout(turnPopupTimer);
-  const inner = document.getElementById('turn-popup-inner');
-  inner.className = player === 1 ? 'p1-style' : 'p2-style';
-  document.getElementById('turn-popup-stone').textContent = player===1 ? '🔴' : (gameMode===1 ? '🤖' : '🔵');
-  document.getElementById('turn-popup-name').textContent = player===1 ? p1name : p2name;
-  const popup = document.getElementById('turn-popup');
+  const inner=document.getElementById('turn-popup-inner');
+  inner.className=player===1?'p1-style':'p2-style';
+  document.getElementById('turn-popup-stone').textContent=player===1?'🔴':(gameMode===1?'🤖':'🔵');
+  document.getElementById('turn-popup-name').textContent=player===1?p1name:p2name;
+  const popup=document.getElementById('turn-popup');
   popup.classList.add('show');
-  turnPopupTimer = setTimeout(() => popup.classList.remove('show'), 1800);
+  turnPopupTimer=setTimeout(()=>popup.classList.remove('show'),1800);
 }
 
 /* ── LEVELS ── */
-const LEVELS = [
-  {id:1, name:'곱셈 새싹', icon:'🌱', color:'#4CAF50', bg:'#e8f5e9', ex:'몇십×몇', desc:'몇십×몇',
-   gen:()=>{ const a=(Math.floor(Math.random()*9)+1)*10, b=Math.floor(Math.random()*9)+1; return{q:`${a}×${b}`,a:a*b}; }},
-  {id:2, name:'곱셈 탐험가', icon:'🌿', color:'#26A69A', bg:'#e0f2f1', ex:'올림없는 몇십몇×몇', desc:'올림 없는<br>몇십몇×몇',
-   gen:()=>{ let a,b,ok=false; while(!ok){const t=Math.floor(Math.random()*8)+1,o=Math.floor(Math.random()*4)+1;a=t*10+o;b=Math.floor(Math.random()*3)+2;const c=Math.floor(o*b/10);ok=c===0&&(t*b+c)<10;} return{q:`${a}×${b}`,a:a*b}; }},
-  {id:3, name:'곱셈 모험가', icon:'⚡', color:'#F9A825', bg:'#fff8e1', ex:'십의자리 올림', desc:'십의 자리<br>올림 있는',
-   gen:()=>{ let a,b,ok=false; while(!ok){const t=Math.floor(Math.random()*8)+1,o=Math.floor(Math.random()*9)+1;a=t*10+o;b=Math.floor(Math.random()*3)+2;const c=Math.floor(o*b/10);ok=c===0&&(t*b)>=10;} return{q:`${a}×${b}`,a:a*b}; }},
-  {id:4, name:'곱셈 전사', icon:'🔥', color:'#EF6C00', bg:'#fff3e0', ex:'일의자리 올림', desc:'일의 자리<br>올림 있는',
-   gen:()=>{ let a,b,ok=false; while(!ok){const t=Math.floor(Math.random()*8)+1,o=Math.floor(Math.random()*9)+1;a=t*10+o;b=Math.floor(Math.random()*3)+2;const c=Math.floor(o*b/10);ok=c>0&&(t*b+c)<10;} return{q:`${a}×${b}`,a:a*b}; }},
-  {id:5, name:'곱셈 마스터', icon:'💎', color:'#7B1FA2', bg:'#f3e5f5', ex:'십&일 자리 올림', desc:'십&일 자리<br>모두 올림',
-   gen:()=>{ let a,b,ok=false; while(!ok){const t=Math.floor(Math.random()*8)+1,o=Math.floor(Math.random()*9)+1;a=t*10+o;b=Math.floor(Math.random()*4)+2;const c=Math.floor(o*b/10);ok=c>0&&(t*b+c)>=10;} return{q:`${a}×${b}`,a:a*b}; }},
-  {id:6, name:'곱셈 명예의 전당', icon:'👑', color:'#B8860B', bg:'#fffde7', ex:'모든 유형 혼합', desc:'곱셈의 달인!<br>모든 유형 혼합',
-   gen:()=> LEVELS[Math.floor(Math.random()*5)].gen()}
+const LEVELS=[
+  {id:1,name:'곱셈 새싹',icon:'🌱',color:'#4CAF50',bg:'#e8f5e9',ex:'몇십×몇',desc:'몇십×몇',gen:()=>{const a=(Math.floor(Math.random()*9)+1)*10,b=Math.floor(Math.random()*9)+1;return{q:`${a}×${b}`,a:a*b};}},
+  {id:2,name:'곱셈 탐험가',icon:'🌿',color:'#26A69A',bg:'#e0f2f1',ex:'올림없는 몇십몇×몇',desc:'올림 없는<br>몇십몇×몇',gen:()=>{let a,b,ok=false;while(!ok){const t=Math.floor(Math.random()*8)+1,o=Math.floor(Math.random()*4)+1;a=t*10+o;b=Math.floor(Math.random()*3)+2;const c=Math.floor(o*b/10);ok=c===0&&(t*b+c)<10;}return{q:`${a}×${b}`,a:a*b};}},
+  {id:3,name:'곱셈 모험가',icon:'⚡',color:'#F9A825',bg:'#fff8e1',ex:'십의자리 올림',desc:'십의 자리<br>올림 있는',gen:()=>{let a,b,ok=false;while(!ok){const t=Math.floor(Math.random()*8)+1,o=Math.floor(Math.random()*9)+1;a=t*10+o;b=Math.floor(Math.random()*3)+2;const c=Math.floor(o*b/10);ok=c===0&&(t*b)>=10;}return{q:`${a}×${b}`,a:a*b};}},
+  {id:4,name:'곱셈 전사',icon:'🔥',color:'#EF6C00',bg:'#fff3e0',ex:'일의자리 올림',desc:'일의 자리<br>올림 있는',gen:()=>{let a,b,ok=false;while(!ok){const t=Math.floor(Math.random()*8)+1,o=Math.floor(Math.random()*9)+1;a=t*10+o;b=Math.floor(Math.random()*3)+2;const c=Math.floor(o*b/10);ok=c>0&&(t*b+c)<10;}return{q:`${a}×${b}`,a:a*b};}},
+  {id:5,name:'곱셈 마스터',icon:'💎',color:'#7B1FA2',bg:'#f3e5f5',ex:'십&일 자리 올림',desc:'십&일 자리<br>모두 올림',gen:()=>{let a,b,ok=false;while(!ok){const t=Math.floor(Math.random()*8)+1,o=Math.floor(Math.random()*9)+1;a=t*10+o;b=Math.floor(Math.random()*4)+2;const c=Math.floor(o*b/10);ok=c>0&&(t*b+c)>=10;}return{q:`${a}×${b}`,a:a*b};}},
+  {id:6,name:'곱셈 명예의 전당',icon:'👑',color:'#B8860B',bg:'#fffde7',ex:'모든 유형 혼합',desc:'곱셈의 달인!<br>모든 유형 혼합',gen:()=>LEVELS[Math.floor(Math.random()*5)].gen()}
 ];
 
-let gameMode=0, selectedLevel=null, currentPlayer=1, selectedCell=null;
-let board=new Array(25).fill(0), gameOver=false, problems=[];
-let p1name='플레이어1', p2name='컴퓨터';
-let stats={1:{ok:0,err:0}, 2:{ok:0,err:0}};
-let aiThinking=false;
-let timerVal=TIMER_MAX, timerInterval=null;
+/* ── STATE ── */
+let TIMER_MAX=40;
+const CIRCUMFERENCE=2*Math.PI*24;
+let selectedTimer=40,selectedFirstTurn='p1';
+let gameMode=2,selectedLevel=null,currentPlayer=1,selectedCell=null;
+let board=new Array(25).fill(0),gameOver=false,problems=[];
+let p1name='플레이어1',p2name='플레이어2';
+let stats={1:{ok:0,err:0},2:{ok:0,err:0}};
+let aiThinking=false,timerVal=TIMER_MAX,timerInterval=null;
 
-/* ── TIMER ── */
-function setTimerDisplay(val){
-  document.getElementById('timer-num').textContent = val;
-  document.getElementById('timer-circle').style.strokeDashoffset = CIRCUMFERENCE*(1-val/TIMER_MAX);
-  if(val<=10) document.getElementById('timer-ring').classList.add('danger');
-  else document.getElementById('timer-ring').classList.remove('danger');
-}
-function startTimer(){
-  clearInterval(timerInterval); timerVal=TIMER_MAX; setTimerDisplay(timerVal);
-  timerInterval = setInterval(()=>{ timerVal--; setTimerDisplay(timerVal); if(timerVal<=0){clearInterval(timerInterval);onTimeout();} }, 1000);
-}
-function stopTimer(){ clearInterval(timerInterval); }
-function resetTimer(){ stopTimer(); timerVal=TIMER_MAX; setTimerDisplay(TIMER_MAX); }
-
-function switchPlayer(){
-  currentPlayer = currentPlayer===1 ? 2 : 1;
-  document.getElementById('card1').classList.toggle('active', currentPlayer===1);
-  document.getElementById('card2').classList.toggle('active', currentPlayer===2);
-  selectedCell = null;
-  document.querySelectorAll('.cell').forEach(c=>c.style.outline='none');
-  document.getElementById('selected-problem').innerHTML = '문제를 선택하세요 👆';
-  document.getElementById('answer-input').value = '';
-  showTurnPopup(currentPlayer);
-  if(gameMode===1 && currentPlayer===2){ setTimeout(()=>doAiTurn(), 600); }
-  else { startTimer(); }
-}
-
-function onTimeout(){
-  if(gameOver||aiThinking) return;
-  if(selectedCell!==null){
-    const cell=document.getElementById('cell-'+selectedCell);
-    cell.style.outline='none'; cell.classList.add('timeout-flash');
-    setTimeout(()=>cell.classList.remove('timeout-flash'),600);
-  }
-  const ring=document.getElementById('timer-ring');
-  ring.classList.add('shake'); setTimeout(()=>ring.classList.remove('shake'),300);
-  stats[currentPlayer].err++; updateStatDisplay();
-  const fb=document.getElementById('feedback');
-  fb.textContent='⏰ 시간 초과! 차례가 넘어갑니다.'; fb.className='timeout';
-  setTimeout(()=>{ fb.textContent=''; switchPlayer(); }, 1200);
+/* ── HOME ── */
+function buildHomeFtRow(){
+  const row=document.getElementById('home-ft-row');row.innerHTML='';
+  [{val:'p1',emoji:'🔴',label:'플레이어 1 선공'},{val:'p2',emoji:'🔵',label:'플레이어 2 선공'},{val:'random',emoji:'🎲',label:'랜덤 선공'}].forEach(opt=>{
+    const c=document.createElement('div');c.className='home-ft-card';c.id='hft-'+opt.val;
+    c.innerHTML=`<div class="hfi">${opt.emoji}</div><div class="hfn">${opt.label}</div>`;
+    c.onclick=()=>{
+      selectedFirstTurn=opt.val;
+      document.querySelectorAll('.home-ft-card').forEach(x=>x.classList.remove('selected'));
+      c.classList.add('selected');
+      const s=document.getElementById('ft-'+opt.val);if(s)s.classList.add('selected');
+    };
+    if(opt.val==='p1') c.classList.add('selected');
+    row.appendChild(c);
+  });
 }
 
 /* ── SETUP ── */
 function selectMode(m){
-  gameMode = m;
-  document.getElementById('mode-1p').classList.toggle('selected', m===1);
-  document.getElementById('mode-2p').classList.toggle('selected', m===2);
-  const b2 = document.getElementById('name2-box');
-  if(m===1){ b2.style.opacity='.45'; document.getElementById('name2').value='컴퓨터'; document.getElementById('name2').disabled=true; }
-  else { b2.style.opacity='1'; document.getElementById('name2').value=''; document.getElementById('name2').disabled=false; }
-  updateFirstTurnLabels();
+  gameMode=m;
+  document.getElementById('mode-1p').classList.toggle('selected',m===1);
+  document.getElementById('mode-2p').classList.toggle('selected',m===2);
+  const b2=document.getElementById('name2-box');
+  if(m===1){b2.style.opacity='.45';document.getElementById('name2').value='컴퓨터';document.getElementById('name2').disabled=true;}
+  else{b2.style.opacity='1';document.getElementById('name2').value='';document.getElementById('name2').disabled=false;}
 }
-
 function buildLevelGrid(){
-  const g = document.getElementById('level-grid'); g.innerHTML='';
+  const g=document.getElementById('level-grid');g.innerHTML='';
   LEVELS.forEach(lv=>{
-    const c = document.createElement('div'); c.className='level-card'; c.id='lv-'+lv.id;
+    const c=document.createElement('div');c.className='level-card';c.id='lv-'+lv.id;
     c.innerHTML=`<div class="badge-icon">${lv.icon}</div><div class="badge-name" style="color:${lv.color}">${lv.name}</div><div class="badge-desc">${lv.desc}</div><div class="badge-ex" style="background:${lv.bg};color:${lv.color}">${lv.ex}</div>`;
-    if(lv.id===6){ c.style.gridColumn='span 3'; c.style.background='linear-gradient(135deg,#fffde7,#fff8dc)'; c.style.border='2px solid #B8860B'; }
-    c.onclick=()=>{ selectedLevel=lv.id; document.querySelectorAll('.level-card').forEach(x=>x.classList.remove('selected')); c.classList.add('selected'); };
+    if(lv.id===6){c.style.gridColumn='span 3';c.style.background='linear-gradient(135deg,#fffde7,#fff8dc)';c.style.border='2px solid #B8860B';}
+    c.onclick=()=>{selectedLevel=lv.id;document.querySelectorAll('.level-card').forEach(x=>x.classList.remove('selected'));c.classList.add('selected');};
     g.appendChild(c);
   });
 }
-
 function buildTimerSelect(){
-  const row = document.getElementById('timer-select-row'); row.innerHTML='';
-  const options = [
-    {val:10, label:'10초', emoji:'⚡'},
-    {val:20, label:'20초', emoji:'🔥'},
-    {val:30, label:'30초', emoji:'⏱️'},
-    {val:40, label:'40초', emoji:'🕐'},
-    {val:60, label:'60초', emoji:'🕑'},
-    {val:90, label:'1분30초', emoji:'🕒'},
-  ];
-  options.forEach(opt=>{
-    const c = document.createElement('div'); c.className='timer-option'; c.id='timer-'+opt.val;
+  const row=document.getElementById('timer-select-row');row.innerHTML='';
+  [{val:10,emoji:'⚡',label:'10초'},{val:20,emoji:'🔥',label:'20초'},{val:30,emoji:'⏱️',label:'30초'},{val:40,emoji:'🕐',label:'40초'},{val:60,emoji:'🕑',label:'60초'},{val:90,emoji:'🕒',label:'1분30초'}].forEach(opt=>{
+    const c=document.createElement('div');c.className='timer-option';c.id='timer-'+opt.val;
     c.innerHTML=`<div class="ti">${opt.emoji}</div><div class="tv">${opt.label}</div>`;
-    c.onclick=()=>{
-      selectedTimer=opt.val;
-      document.querySelectorAll('.timer-option').forEach(x=>x.classList.remove('selected'));
-      c.classList.add('selected');
-    };
-    if(opt.val===40) { c.classList.add('selected'); selectedTimer=40; }
+    c.onclick=()=>{selectedTimer=opt.val;document.querySelectorAll('.timer-option').forEach(x=>x.classList.remove('selected'));c.classList.add('selected');};
+    if(opt.val===40) c.classList.add('selected');
     row.appendChild(c);
   });
 }
-
-function buildFirstTurnSelect(){
-  const row = document.getElementById('first-turn-row'); row.innerHTML='';
-  const options = [
-    {val:'p1', emoji:'🔴', label:'플레이어 1 선공'},
-    {val:'p2', emoji:'🔵', label:'플레이어 2 선공'},
-    {val:'random', emoji:'🎲', label:'랜덤 선공'},
-  ];
-  options.forEach(opt=>{
-    const c = document.createElement('div'); c.className='first-turn-card'; c.id='ft-'+opt.val;
-    c.innerHTML=`<div class="fti">${opt.emoji}</div><div class="ftn">${opt.label}</div>`;
-    c.onclick=()=>{
-      selectedFirstTurn=opt.val;
-      document.querySelectorAll('.first-turn-card').forEach(x=>x.classList.remove('selected'));
-      c.classList.add('selected');
-    };
-    if(opt.val==='p1') { c.classList.add('selected'); selectedFirstTurn='p1'; }
-    row.appendChild(c);
-  });
-}
-
-function updateFirstTurnLabels(){
-  // Update second option label based on mode
-  const p2label = document.getElementById('ft-p2');
-  if(!p2label) return;
-  if(gameMode===1){
-    p2label.querySelector('.ftn').textContent='컴퓨터 선공';
-    p2label.querySelector('.fti').textContent='🤖';
-  } else {
-    p2label.querySelector('.ftn').textContent='플레이어 2 선공';
-    p2label.querySelector('.fti').textContent='🔵';
-  }
-}
-
-function genProblems(){
-  const lv=LEVELS[selectedLevel-1], set=[], seen=new Set(); let tries=0;
-  while(set.length<25&&tries<5000){ tries++; const p=lv.gen(); if(!seen.has(p.q)){seen.add(p.q);set.push(p);} }
-  while(set.length<25){ set.push(lv.gen()); }
-  return set;
-}
-
 function startGame(){
-  const n1 = document.getElementById('name1').value.trim();
-  const n2raw = document.getElementById('name2').value.trim();
-  if(!n1||(gameMode===2&&!n2raw)){ alert('이름을 입력해주세요!'); return; }
-  if(!gameMode){ alert('모드를 선택해주세요!'); return; }
-  if(!selectedLevel){ alert('난이도를 선택해주세요!'); return; }
-  // Apply timer
-  TIMER_MAX = selectedTimer;
-  // Determine first player
-  let firstPlayer = 1;
-  if(selectedFirstTurn==='p2') firstPlayer=2;
-  else if(selectedFirstTurn==='random') firstPlayer=Math.random()<0.5?1:2;
+  const n1=document.getElementById('name1').value.trim();
+  const n2raw=document.getElementById('name2').value.trim();
+  if(!n1||(gameMode===2&&!n2raw)){alert('이름을 입력해주세요!');return;}
+  if(!gameMode){alert('모드를 선택해주세요!');return;}
+  if(!selectedLevel){alert('난이도를 선택해주세요!');return;}
+  launchGameWith(n1,n2raw||'컴퓨터');
+}
 
-  p1name=n1; p2name=gameMode===1?'🤖 컴퓨터':n2raw;
-  const lv=LEVELS[selectedLevel-1];
+/* ── LAUNCH ── */
+function launchGameWith(n1,n2raw){
+  TIMER_MAX=selectedTimer;
+  let firstPlayer=1;
+  if(selectedFirstTurn==='p2') firstPlayer=2;
+  else if(selectedFirstTurn==='random') firstPlayer=Math.random()<.5?1:2;
+  p1name=n1;p2name=gameMode===1?'🤖 컴퓨터':n2raw;
+  const lv=LEVELS[(selectedLevel||1)-1];
   document.getElementById('display-name1').textContent=p1name;
   document.getElementById('display-name2').textContent=p2name;
   document.getElementById('p2-stone').textContent=gameMode===1?'🤖':'🔵';
@@ -540,39 +466,65 @@ function startGame(){
   document.getElementById('mini-icon').textContent=lv.icon;
   document.getElementById('mini-name').textContent=lv.name;
   document.getElementById('game-nav-title').textContent=lv.icon+' '+lv.name;
-  stats={1:{ok:0,err:0},2:{ok:0,err:0}}; updateStatDisplay();
+  stats={1:{ok:0,err:0},2:{ok:0,err:0}};updateStatDisplay();
   problems=genProblems();
-  currentPlayer=firstPlayer; selectedCell=null; board=new Array(25).fill(0); gameOver=false; aiThinking=false;
-  document.getElementById('card1').classList.toggle('active', firstPlayer===1);
-  document.getElementById('card2').classList.toggle('active', firstPlayer===2);
+  currentPlayer=firstPlayer;selectedCell=null;board=new Array(25).fill(0);gameOver=false;aiThinking=false;
+  document.getElementById('card1').classList.toggle('active',firstPlayer===1);
+  document.getElementById('card2').classList.toggle('active',firstPlayer===2);
   document.getElementById('feedback').textContent='';
   document.getElementById('selected-problem').innerHTML='문제를 선택하세요 👆';
   document.getElementById('answer-input').value='';
   document.getElementById('answer-input').disabled=false;
   document.getElementById('submit-btn').disabled=false;
-  buildBoard();
-  showScreen('game');
-  setTimeout(()=>{
-    showTurnPopup(firstPlayer);
-    if(gameMode===1 && firstPlayer===2){ setTimeout(()=>doAiTurn(), 600); }
-    else { startTimer(); }
-  }, 300);
+  buildBoard();showScreen('game');
+  setTimeout(()=>{showTurnPopup(firstPlayer);if(gameMode===1&&firstPlayer===2){setTimeout(()=>doAiTurn(),600);}else{startTimer();}},300);
 }
 
+/* ── TIMER ── */
+function setTimerDisplay(val){
+  document.getElementById('timer-num').textContent=val;
+  document.getElementById('timer-circle').style.strokeDashoffset=CIRCUMFERENCE*(1-val/TIMER_MAX);
+  if(val<=10) document.getElementById('timer-ring').classList.add('danger');
+  else document.getElementById('timer-ring').classList.remove('danger');
+}
+function startTimer(){clearInterval(timerInterval);timerVal=TIMER_MAX;setTimerDisplay(timerVal);timerInterval=setInterval(()=>{timerVal--;setTimerDisplay(timerVal);if(timerVal<=0){clearInterval(timerInterval);onTimeout();}},1000);}
+function stopTimer(){clearInterval(timerInterval);}
+function resetTimer(){stopTimer();timerVal=TIMER_MAX;setTimerDisplay(TIMER_MAX);}
+
+function switchPlayer(){
+  currentPlayer=currentPlayer===1?2:1;
+  document.getElementById('card1').classList.toggle('active',currentPlayer===1);
+  document.getElementById('card2').classList.toggle('active',currentPlayer===2);
+  selectedCell=null;document.querySelectorAll('.cell').forEach(c=>c.style.outline='none');
+  document.getElementById('selected-problem').innerHTML='문제를 선택하세요 👆';
+  document.getElementById('answer-input').value='';
+  showTurnPopup(currentPlayer);
+  if(gameMode===1&&currentPlayer===2){setTimeout(()=>doAiTurn(),600);}else{startTimer();}
+}
+function onTimeout(){
+  if(gameOver||aiThinking) return;
+  if(selectedCell!==null){const cell=document.getElementById('cell-'+selectedCell);cell.style.outline='none';cell.classList.add('timeout-flash');setTimeout(()=>cell.classList.remove('timeout-flash'),600);}
+  const ring=document.getElementById('timer-ring');ring.classList.add('shake');setTimeout(()=>ring.classList.remove('shake'),300);
+  stats[currentPlayer].err++;updateStatDisplay();
+  const fb=document.getElementById('feedback');fb.textContent='⏰ 시간 초과! 차례가 넘어갑니다.';fb.className='timeout';
+  setTimeout(()=>{fb.textContent='';switchPlayer();},1200);
+}
+
+/* ── GAME LOGIC ── */
+function genProblems(){
+  const lv=LEVELS[(selectedLevel||1)-1],set=[],seen=new Set();let tries=0;
+  while(set.length<25&&tries<5000){tries++;const p=lv.gen();if(!seen.has(p.q)){seen.add(p.q);set.push(p);}}
+  while(set.length<25){set.push(lv.gen());}
+  return set;
+}
 function updateStatDisplay(){
-  document.getElementById('s1-ok').textContent=stats[1].ok; document.getElementById('s1-err').textContent=stats[1].err;
-  document.getElementById('s2-ok').textContent=stats[2].ok; document.getElementById('s2-err').textContent=stats[2].err;
+  document.getElementById('s1-ok').textContent=stats[1].ok;document.getElementById('s1-err').textContent=stats[1].err;
+  document.getElementById('s2-ok').textContent=stats[2].ok;document.getElementById('s2-err').textContent=stats[2].err;
 }
-
 function buildBoard(){
-  const el=document.getElementById('board'); el.innerHTML='';
-  problems.forEach((p,i)=>{
-    const cell=document.createElement('div'); cell.className='cell'; cell.id='cell-'+i;
-    cell.innerHTML=`<div class="problem">${p.q}</div><div class="stone-piece"></div>`;
-    cell.onclick=()=>selectCell(i); el.appendChild(cell);
-  });
+  const el=document.getElementById('board');el.innerHTML='';
+  problems.forEach((p,i)=>{const cell=document.createElement('div');cell.className='cell';cell.id='cell-'+i;cell.innerHTML=`<div class="problem">${p.q}</div><div class="stone-piece"></div>`;cell.onclick=()=>selectCell(i);el.appendChild(cell);});
 }
-
 function selectCell(i){
   if(gameOver||board[i]!==0||aiThinking) return;
   if(gameMode===1&&currentPlayer===2) return;
@@ -580,86 +532,53 @@ function selectCell(i){
   document.querySelectorAll('.cell').forEach(c=>c.style.outline='none');
   document.getElementById('cell-'+i).style.outline='4px solid '+(currentPlayer===1?'#cc0000':'#0033cc');
   document.getElementById('selected-problem').innerHTML=`문제: <strong>${problems[i].q} = ?</strong>`;
-  document.getElementById('answer-input').value='';
-  document.getElementById('feedback').textContent='';
+  document.getElementById('answer-input').value='';document.getElementById('feedback').textContent='';
   document.getElementById('answer-input').focus();
 }
-
 function checkAnswer(){
   if(gameOver||selectedCell===null||aiThinking) return;
-  const input=document.getElementById('answer-input').value.trim(); if(!input) return;
-  const userAns=parseInt(input), correct=problems[selectedCell].a;
+  const input=document.getElementById('answer-input').value.trim();if(!input) return;
+  const userAns=parseInt(input),correct=problems[selectedCell].a;
   const fb=document.getElementById('feedback');
-  if(userAns===correct){
-    stopTimer(); stats[currentPlayer].ok++; updateStatDisplay();
-    fb.textContent='✅ 정답! 바둑돌을 놓습니다.'; fb.className='ok';
-    placeStone(selectedCell);
-  } else {
-    stats[currentPlayer].err++; updateStatDisplay();
-    fb.textContent=`❌ 틀렸습니다! 정답은 ${correct} — 차례가 넘어갑니다.`; fb.className='err';
-    stopTimer();
-    setTimeout(()=>{ fb.textContent=''; switchPlayer(); }, 1600);
-  }
+  if(userAns===correct){stopTimer();stats[currentPlayer].ok++;updateStatDisplay();fb.textContent='✅ 정답! 바둑돌을 놓습니다.';fb.className='ok';placeStone(selectedCell);}
+  else{stats[currentPlayer].err++;updateStatDisplay();fb.textContent=`❌ 틀렸습니다! 정답은 ${correct} — 차례가 넘어갑니다.`;fb.className='err';stopTimer();setTimeout(()=>{fb.textContent='';switchPlayer();},1600);}
 }
-
 function placeStone(i){
-  board[i]=currentPlayer;
-  const cell=document.getElementById('cell-'+i);
-  cell.classList.add('taken','p'+currentPlayer); cell.style.outline='none';
+  board[i]=currentPlayer;const cell=document.getElementById('cell-'+i);
+  cell.classList.add('taken','p'+currentPlayer);cell.style.outline='none';
   cell.querySelector('.problem').textContent=problems[i].q+'='+problems[i].a;
-  selectedCell=null;
-  document.getElementById('selected-problem').innerHTML='문제를 선택하세요 👆';
-  document.getElementById('answer-input').value='';
+  selectedCell=null;document.getElementById('selected-problem').innerHTML='문제를 선택하세요 👆';document.getElementById('answer-input').value='';
   const winCells=checkWin(currentPlayer);
-  if(winCells){ winCells.forEach(idx=>document.getElementById('cell-'+idx).classList.add('win-cell')); stopTimer(); setTimeout(()=>showResult(currentPlayer),350); return; }
-  if(board.every(v=>v!==0)){ stopTimer(); setTimeout(()=>showDraw(),350); return; }
-  setTimeout(()=>switchPlayer(), 300);
+  if(winCells){winCells.forEach(idx=>document.getElementById('cell-'+idx).classList.add('win-cell'));stopTimer();setTimeout(()=>showResult(currentPlayer),350);return;}
+  if(board.every(v=>v!==0)){stopTimer();setTimeout(()=>showDraw(),350);return;}
+  setTimeout(()=>switchPlayer(),300);
 }
-
 function doAiTurn(){
-  aiThinking=true; stopTimer(); resetTimer();
-  document.getElementById('feedback').textContent='🤖 컴퓨터가 생각하는 중...'; document.getElementById('feedback').className='ai';
-  document.getElementById('answer-input').disabled=true; document.getElementById('submit-btn').disabled=true;
-
-  // Human-like thinking delay: 1.5~4 seconds
-  const thinkDelay = 1500 + Math.random() * 2500;
-
+  aiThinking=true;stopTimer();resetTimer();
+  document.getElementById('feedback').textContent='🤖 컴퓨터가 생각하는 중...';document.getElementById('feedback').className='ai';
+  document.getElementById('answer-input').disabled=true;document.getElementById('submit-btn').disabled=true;
+  const thinkDelay=1500+Math.random()*2500;
   setTimeout(()=>{
     const avail=board.map((v,i)=>v===0?i:-1).filter(x=>x>=0);
-    if(!avail.length){ aiThinking=false; return; }
-
-    // Pick best cell (win / block / strategic)
+    if(!avail.length){aiThinking=false;return;}
     let bestPick=null;
     for(const idx of avail){board[idx]=2;if(checkWin(2)){board[idx]=0;bestPick=idx;break;}board[idx]=0;}
     if(bestPick===null){for(const idx of avail){board[idx]=1;if(checkWin(1)){board[idx]=0;bestPick=idx;break;}board[idx]=0;}}
     if(bestPick===null) bestPick=avail[Math.floor(Math.random()*avail.length)];
-
-    // 70-80% accuracy: sometimes pick wrong (random) cell
-    const accuracy = 0.70 + Math.random()*0.10; // 70~80%
+    const accuracy=.70+Math.random()*.10;
     let pick;
-    if(Math.random() < accuracy){
-      pick = bestPick; // correct/smart choice
-    } else {
-      // Make a mistake: pick a random non-winning cell
-      const nonWinCells = avail.filter(idx=>idx!==bestPick);
-      pick = nonWinCells.length>0 ? nonWinCells[Math.floor(Math.random()*nonWinCells.length)] : bestPick;
-      stats[2].err++; updateStatDisplay();
-    }
-
+    if(Math.random()<accuracy){pick=bestPick;}
+    else{const nw=avail.filter(idx=>idx!==bestPick);pick=nw.length>0?nw[Math.floor(Math.random()*nw.length)]:bestPick;stats[2].err++;updateStatDisplay();}
     document.getElementById('cell-'+pick).classList.add('ai-thinking');
-
-    // Additional "deciding" delay: 0.5~1.5s after thinking
-    const placeDelay = 500 + Math.random() * 1000;
     setTimeout(()=>{
       document.getElementById('cell-'+pick).classList.remove('ai-thinking');
-      stats[2].ok++; updateStatDisplay();
-      document.getElementById('feedback').textContent=`🤖 컴퓨터: ${problems[pick].q} = ${problems[pick].a}`; document.getElementById('feedback').className='ai';
-      document.getElementById('answer-input').disabled=false; document.getElementById('submit-btn').disabled=false;
-      aiThinking=false; placeStone(pick);
-    }, placeDelay);
-  }, thinkDelay);
+      stats[2].ok++;updateStatDisplay();
+      document.getElementById('feedback').textContent=`🤖 컴퓨터: ${problems[pick].q} = ${problems[pick].a}`;document.getElementById('feedback').className='ai';
+      document.getElementById('answer-input').disabled=false;document.getElementById('submit-btn').disabled=false;
+      aiThinking=false;placeStone(pick);
+    },500+Math.random()*1000);
+  },thinkDelay);
 }
-
 function checkWin(p){
   const lines=[];
   for(let r=0;r<5;r++) for(let c=0;c<5;c++){
@@ -671,59 +590,45 @@ function checkWin(p){
   for(const line of lines) if(line.every(idx=>board[idx]===p)) return line;
   return null;
 }
-
 function showResult(p){
-  gameOver=true; stopTimer();
-  const lv=LEVELS[selectedLevel-1];
-  const winName=p===1?p1name:p2name;
+  gameOver=true;stopTimer();
+  const lv=LEVELS[(selectedLevel||1)-1];
   document.getElementById('result-emoji').textContent='🏆';
-  document.getElementById('result-title').textContent=`${winName} 승리! 🎉`;
+  document.getElementById('result-title').textContent=`${p===1?p1name:p2name} 승리! 🎉`;
   document.getElementById('result-desc').textContent=`[${lv.icon} ${lv.name}] 클리어!`;
-  document.getElementById('sl1').textContent=p1name; document.getElementById('sv1').textContent=`${stats[1].ok}정 ${stats[1].err}오`;
-  document.getElementById('sl2').textContent=p2name; document.getElementById('sv2').textContent=`${stats[2].ok}정 ${stats[2].err}오`;
-  document.getElementById('result-overlay').classList.add('show');
-  launchConfetti();
+  document.getElementById('sl1').textContent=p1name;document.getElementById('sv1').textContent=`${stats[1].ok}정 ${stats[1].err}오`;
+  document.getElementById('sl2').textContent=p2name;document.getElementById('sv2').textContent=`${stats[2].ok}정 ${stats[2].err}오`;
+  document.getElementById('result-overlay').classList.add('show');launchConfetti();
 }
 function showDraw(){
-  gameOver=true; stopTimer();
+  gameOver=true;stopTimer();
   document.getElementById('result-emoji').textContent='🤝';
   document.getElementById('result-title').textContent='무승부!';
   document.getElementById('result-desc').textContent='모든 칸을 채웠습니다! 정말 팽팽한 싸움!';
-  document.getElementById('sl1').textContent=p1name; document.getElementById('sv1').textContent=`${stats[1].ok}정 ${stats[1].err}오`;
-  document.getElementById('sl2').textContent=p2name; document.getElementById('sv2').textContent=`${stats[2].ok}정 ${stats[2].err}오`;
+  document.getElementById('sl1').textContent=p1name;document.getElementById('sv1').textContent=`${stats[1].ok}정 ${stats[1].err}오`;
+  document.getElementById('sl2').textContent=p2name;document.getElementById('sv2').textContent=`${stats[2].ok}정 ${stats[2].err}오`;
   document.getElementById('result-overlay').classList.add('show');
 }
 function restartGame(){
-  document.getElementById('result-overlay').classList.remove('show');
-  stopConfetti();
-  TIMER_MAX = selectedTimer;
-  let firstPlayer = 1;
-  if(selectedFirstTurn==='p2') firstPlayer=2;
-  else if(selectedFirstTurn==='random') firstPlayer=Math.random()<0.5?1:2;
-  stats={1:{ok:0,err:0},2:{ok:0,err:0}}; updateStatDisplay();
-  problems=genProblems(); currentPlayer=firstPlayer; selectedCell=null; board=new Array(25).fill(0); gameOver=false; aiThinking=false;
-  document.getElementById('card1').classList.toggle('active', firstPlayer===1);
-  document.getElementById('card2').classList.toggle('active', firstPlayer===2);
-  document.getElementById('feedback').textContent='';
-  document.getElementById('selected-problem').innerHTML='문제를 선택하세요 👆';
-  document.getElementById('answer-input').value='';
-  document.getElementById('answer-input').disabled=false; document.getElementById('submit-btn').disabled=false;
-  buildBoard();
-  showScreen('game');
-  setTimeout(()=>{
-    showTurnPopup(firstPlayer);
-    if(gameMode===1 && firstPlayer===2){ setTimeout(()=>doAiTurn(), 600); }
-    else { startTimer(); }
-  }, 300);
+  document.getElementById('result-overlay').classList.remove('show');stopConfetti();
+  TIMER_MAX=selectedTimer;
+  let fp=1;if(selectedFirstTurn==='p2') fp=2;else if(selectedFirstTurn==='random') fp=Math.random()<.5?1:2;
+  stats={1:{ok:0,err:0},2:{ok:0,err:0}};updateStatDisplay();
+  problems=genProblems();currentPlayer=fp;selectedCell=null;board=new Array(25).fill(0);gameOver=false;aiThinking=false;
+  document.getElementById('card1').classList.toggle('active',fp===1);document.getElementById('card2').classList.toggle('active',fp===2);
+  document.getElementById('feedback').textContent='';document.getElementById('selected-problem').innerHTML='문제를 선택하세요 👆';
+  document.getElementById('answer-input').value='';document.getElementById('answer-input').disabled=false;document.getElementById('submit-btn').disabled=false;
+  buildBoard();showScreen('game');
+  setTimeout(()=>{showTurnPopup(fp);if(gameMode===1&&fp===2){setTimeout(()=>doAiTurn(),600);}else{startTimer();}},300);
 }
 
-document.getElementById('answer-input').addEventListener('keydown', e=>{ if(e.key==='Enter') checkAnswer(); });
-document.getElementById('timer-circle').style.strokeDasharray = CIRCUMFERENCE;
-document.getElementById('timer-circle').style.strokeDashoffset = 0;
-selectMode(2);
-buildLevelGrid();
-buildTimerSelect();
-buildFirstTurnSelect();
+/* ── INIT ── */
+document.getElementById('answer-input').addEventListener('keydown',e=>{if(e.key==='Enter') checkAnswer();});
+document.getElementById('timer-circle').style.strokeDasharray=CIRCUMFERENCE;
+document.getElementById('timer-circle').style.strokeDashoffset=0;
+buildHomeFtRow();
+selectMode(2);buildLevelGrid();buildTimerSelect();
+showScreen('home');
 </script>
 </body>
 </html>
