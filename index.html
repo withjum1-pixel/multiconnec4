@@ -41,6 +41,18 @@ body{font-family:'Noto Sans KR','Malgun Gothic',sans-serif;background:#f5f3ff;mi
 .start-btn{padding:14px 0;font-size:19px;font-weight:800;border-radius:12px;cursor:pointer;border:none;background:linear-gradient(135deg,#7c5cbf,#5a3fa0);color:white;width:100%;max-width:660px;transition:transform .15s,opacity .15s;}
 .start-btn:hover{transform:scale(1.02);opacity:.93;}
 
+.timer-select-row{display:flex;gap:8px;flex-wrap:wrap;width:100%;max-width:660px;align-items:center;}
+.timer-option{flex:1;min-width:60px;border-radius:10px;padding:10px 6px;cursor:pointer;border:2px solid #ddd;text-align:center;transition:all 0.15s;background:#fff;font-size:14px;font-weight:700;color:#555;}
+.timer-option:hover{transform:scale(1.04);}
+.timer-option.selected{border-color:#7c5cbf;background:#f0ebff;color:#5a3fa0;box-shadow:0 0 0 3px rgba(124,92,191,0.18);}
+.timer-option .ti{font-size:20px;}.timer-option .tv{font-size:13px;font-weight:800;margin-top:2px;}.timer-option .ts{font-size:11px;color:#aaa;}
+
+.first-turn-row{display:flex;gap:10px;width:100%;max-width:660px;}
+.first-turn-card{flex:1;border-radius:12px;padding:12px 8px;cursor:pointer;border:2px solid #ddd;text-align:center;background:#fff;transition:all 0.15s;}
+.first-turn-card:hover{transform:scale(1.03);}
+.first-turn-card.selected{border-color:#7c5cbf;box-shadow:0 0 0 3px rgba(124,92,191,0.18);}
+.first-turn-card .fti{font-size:26px;}.first-turn-card .ftn{font-size:13px;font-weight:800;margin-top:3px;}
+
 #scoreboard{display:flex;gap:10px;width:100%;max-width:660px;align-items:center;}
 .player-card{flex:1;border-radius:12px;padding:10px;display:flex;flex-direction:column;align-items:center;border:4px solid transparent;transition:all .2s;}
 .player-card.p1{background:#fce8e8;color:#9b2222;}
@@ -144,7 +156,7 @@ body{font-family:'Noto Sans KR','Malgun Gothic',sans-serif;background:#f5f3ff;mi
     ✅ 1인 모드 (vs 컴퓨터)<br>
     ✅ 2인 모드 (친구와 대결)<br>
     ✅ 6단계 난이도<br>
-    ✅ 40초 타이머
+    ✅ 제한 시간 선택 (10초~90초)
   </div>
 </div>
 
@@ -167,6 +179,10 @@ body{font-family:'Noto Sans KR','Malgun Gothic',sans-serif;background:#f5f3ff;mi
   </div>
   <div class="level-sec-title">📚 난이도 선택</div>
   <div class="level-grid" id="level-grid"></div>
+  <div class="level-sec-title">⏱️ 제한 시간 선택</div>
+  <div class="timer-select-row" id="timer-select-row"></div>
+  <div class="level-sec-title" id="first-turn-label">🎯 선공 선택</div>
+  <div class="first-turn-row" id="first-turn-row"></div>
   <button class="start-btn" onclick="startGame()">게임 시작! 🎮</button>
 </div>
 
@@ -266,8 +282,10 @@ body{font-family:'Noto Sans KR','Malgun Gothic',sans-serif;background:#f5f3ff;mi
 </div>
 
 <script>
-const TIMER_MAX = 40;
+let TIMER_MAX = 40;
 const CIRCUMFERENCE = 2 * Math.PI * 24;
+let selectedTimer = 40;
+let selectedFirstTurn = 'p1'; // 'p1' | 'p2' | 'random'
 
 /* ── CONFETTI ── */
 const canvas = document.getElementById('confetti-canvas');
@@ -423,6 +441,7 @@ function selectMode(m){
   const b2 = document.getElementById('name2-box');
   if(m===1){ b2.style.opacity='.45'; document.getElementById('name2').value='컴퓨터'; document.getElementById('name2').disabled=true; }
   else { b2.style.opacity='1'; document.getElementById('name2').value=''; document.getElementById('name2').disabled=false; }
+  updateFirstTurnLabels();
 }
 
 function buildLevelGrid(){
@@ -434,6 +453,62 @@ function buildLevelGrid(){
     c.onclick=()=>{ selectedLevel=lv.id; document.querySelectorAll('.level-card').forEach(x=>x.classList.remove('selected')); c.classList.add('selected'); };
     g.appendChild(c);
   });
+}
+
+function buildTimerSelect(){
+  const row = document.getElementById('timer-select-row'); row.innerHTML='';
+  const options = [
+    {val:10, label:'10초', emoji:'⚡'},
+    {val:20, label:'20초', emoji:'🔥'},
+    {val:30, label:'30초', emoji:'⏱️'},
+    {val:40, label:'40초', emoji:'🕐'},
+    {val:60, label:'60초', emoji:'🕑'},
+    {val:90, label:'1분30초', emoji:'🕒'},
+  ];
+  options.forEach(opt=>{
+    const c = document.createElement('div'); c.className='timer-option'; c.id='timer-'+opt.val;
+    c.innerHTML=`<div class="ti">${opt.emoji}</div><div class="tv">${opt.label}</div>`;
+    c.onclick=()=>{
+      selectedTimer=opt.val;
+      document.querySelectorAll('.timer-option').forEach(x=>x.classList.remove('selected'));
+      c.classList.add('selected');
+    };
+    if(opt.val===40) { c.classList.add('selected'); selectedTimer=40; }
+    row.appendChild(c);
+  });
+}
+
+function buildFirstTurnSelect(){
+  const row = document.getElementById('first-turn-row'); row.innerHTML='';
+  const options = [
+    {val:'p1', emoji:'🔴', label:'플레이어 1 선공'},
+    {val:'p2', emoji:'🔵', label:'플레이어 2 선공'},
+    {val:'random', emoji:'🎲', label:'랜덤 선공'},
+  ];
+  options.forEach(opt=>{
+    const c = document.createElement('div'); c.className='first-turn-card'; c.id='ft-'+opt.val;
+    c.innerHTML=`<div class="fti">${opt.emoji}</div><div class="ftn">${opt.label}</div>`;
+    c.onclick=()=>{
+      selectedFirstTurn=opt.val;
+      document.querySelectorAll('.first-turn-card').forEach(x=>x.classList.remove('selected'));
+      c.classList.add('selected');
+    };
+    if(opt.val==='p1') { c.classList.add('selected'); selectedFirstTurn='p1'; }
+    row.appendChild(c);
+  });
+}
+
+function updateFirstTurnLabels(){
+  // Update second option label based on mode
+  const p2label = document.getElementById('ft-p2');
+  if(!p2label) return;
+  if(gameMode===1){
+    p2label.querySelector('.ftn').textContent='컴퓨터 선공';
+    p2label.querySelector('.fti').textContent='🤖';
+  } else {
+    p2label.querySelector('.ftn').textContent='플레이어 2 선공';
+    p2label.querySelector('.fti').textContent='🔵';
+  }
 }
 
 function genProblems(){
@@ -449,6 +524,13 @@ function startGame(){
   if(!n1||(gameMode===2&&!n2raw)){ alert('이름을 입력해주세요!'); return; }
   if(!gameMode){ alert('모드를 선택해주세요!'); return; }
   if(!selectedLevel){ alert('난이도를 선택해주세요!'); return; }
+  // Apply timer
+  TIMER_MAX = selectedTimer;
+  // Determine first player
+  let firstPlayer = 1;
+  if(selectedFirstTurn==='p2') firstPlayer=2;
+  else if(selectedFirstTurn==='random') firstPlayer=Math.random()<0.5?1:2;
+
   p1name=n1; p2name=gameMode===1?'🤖 컴퓨터':n2raw;
   const lv=LEVELS[selectedLevel-1];
   document.getElementById('display-name1').textContent=p1name;
@@ -460,9 +542,9 @@ function startGame(){
   document.getElementById('game-nav-title').textContent=lv.icon+' '+lv.name;
   stats={1:{ok:0,err:0},2:{ok:0,err:0}}; updateStatDisplay();
   problems=genProblems();
-  currentPlayer=1; selectedCell=null; board=new Array(25).fill(0); gameOver=false; aiThinking=false;
-  document.getElementById('card1').classList.add('active');
-  document.getElementById('card2').classList.remove('active');
+  currentPlayer=firstPlayer; selectedCell=null; board=new Array(25).fill(0); gameOver=false; aiThinking=false;
+  document.getElementById('card1').classList.toggle('active', firstPlayer===1);
+  document.getElementById('card2').classList.toggle('active', firstPlayer===2);
   document.getElementById('feedback').textContent='';
   document.getElementById('selected-problem').innerHTML='문제를 선택하세요 👆';
   document.getElementById('answer-input').value='';
@@ -470,8 +552,11 @@ function startGame(){
   document.getElementById('submit-btn').disabled=false;
   buildBoard();
   showScreen('game');
-  setTimeout(()=>showTurnPopup(1), 300);
-  startTimer();
+  setTimeout(()=>{
+    showTurnPopup(firstPlayer);
+    if(gameMode===1 && firstPlayer===2){ setTimeout(()=>doAiTurn(), 600); }
+    else { startTimer(); }
+  }, 300);
 }
 
 function updateStatDisplay(){
@@ -535,22 +620,44 @@ function doAiTurn(){
   aiThinking=true; stopTimer(); resetTimer();
   document.getElementById('feedback').textContent='🤖 컴퓨터가 생각하는 중...'; document.getElementById('feedback').className='ai';
   document.getElementById('answer-input').disabled=true; document.getElementById('submit-btn').disabled=true;
+
+  // Human-like thinking delay: 1.5~4 seconds
+  const thinkDelay = 1500 + Math.random() * 2500;
+
   setTimeout(()=>{
     const avail=board.map((v,i)=>v===0?i:-1).filter(x=>x>=0);
     if(!avail.length){ aiThinking=false; return; }
-    let pick=null;
-    for(const idx of avail){board[idx]=2;if(checkWin(2)){board[idx]=0;pick=idx;break;}board[idx]=0;}
-    if(pick===null){for(const idx of avail){board[idx]=1;if(checkWin(1)){board[idx]=0;pick=idx;break;}board[idx]=0;}}
-    if(pick===null) pick=avail[Math.floor(Math.random()*avail.length)];
+
+    // Pick best cell (win / block / strategic)
+    let bestPick=null;
+    for(const idx of avail){board[idx]=2;if(checkWin(2)){board[idx]=0;bestPick=idx;break;}board[idx]=0;}
+    if(bestPick===null){for(const idx of avail){board[idx]=1;if(checkWin(1)){board[idx]=0;bestPick=idx;break;}board[idx]=0;}}
+    if(bestPick===null) bestPick=avail[Math.floor(Math.random()*avail.length)];
+
+    // 70-80% accuracy: sometimes pick wrong (random) cell
+    const accuracy = 0.70 + Math.random()*0.10; // 70~80%
+    let pick;
+    if(Math.random() < accuracy){
+      pick = bestPick; // correct/smart choice
+    } else {
+      // Make a mistake: pick a random non-winning cell
+      const nonWinCells = avail.filter(idx=>idx!==bestPick);
+      pick = nonWinCells.length>0 ? nonWinCells[Math.floor(Math.random()*nonWinCells.length)] : bestPick;
+      stats[2].err++; updateStatDisplay();
+    }
+
     document.getElementById('cell-'+pick).classList.add('ai-thinking');
+
+    // Additional "deciding" delay: 0.5~1.5s after thinking
+    const placeDelay = 500 + Math.random() * 1000;
     setTimeout(()=>{
       document.getElementById('cell-'+pick).classList.remove('ai-thinking');
       stats[2].ok++; updateStatDisplay();
       document.getElementById('feedback').textContent=`🤖 컴퓨터: ${problems[pick].q} = ${problems[pick].a}`; document.getElementById('feedback').className='ai';
       document.getElementById('answer-input').disabled=false; document.getElementById('submit-btn').disabled=false;
       aiThinking=false; placeStone(pick);
-    }, 700);
-  }, 900);
+    }, placeDelay);
+  }, thinkDelay);
 }
 
 function checkWin(p){
@@ -589,17 +696,25 @@ function showDraw(){
 function restartGame(){
   document.getElementById('result-overlay').classList.remove('show');
   stopConfetti();
+  TIMER_MAX = selectedTimer;
+  let firstPlayer = 1;
+  if(selectedFirstTurn==='p2') firstPlayer=2;
+  else if(selectedFirstTurn==='random') firstPlayer=Math.random()<0.5?1:2;
   stats={1:{ok:0,err:0},2:{ok:0,err:0}}; updateStatDisplay();
-  problems=genProblems(); currentPlayer=1; selectedCell=null; board=new Array(25).fill(0); gameOver=false; aiThinking=false;
-  document.getElementById('card1').classList.add('active'); document.getElementById('card2').classList.remove('active');
+  problems=genProblems(); currentPlayer=firstPlayer; selectedCell=null; board=new Array(25).fill(0); gameOver=false; aiThinking=false;
+  document.getElementById('card1').classList.toggle('active', firstPlayer===1);
+  document.getElementById('card2').classList.toggle('active', firstPlayer===2);
   document.getElementById('feedback').textContent='';
   document.getElementById('selected-problem').innerHTML='문제를 선택하세요 👆';
   document.getElementById('answer-input').value='';
   document.getElementById('answer-input').disabled=false; document.getElementById('submit-btn').disabled=false;
   buildBoard();
   showScreen('game');
-  setTimeout(()=>showTurnPopup(1), 300);
-  startTimer();
+  setTimeout(()=>{
+    showTurnPopup(firstPlayer);
+    if(gameMode===1 && firstPlayer===2){ setTimeout(()=>doAiTurn(), 600); }
+    else { startTimer(); }
+  }, 300);
 }
 
 document.getElementById('answer-input').addEventListener('keydown', e=>{ if(e.key==='Enter') checkAnswer(); });
@@ -607,6 +722,8 @@ document.getElementById('timer-circle').style.strokeDasharray = CIRCUMFERENCE;
 document.getElementById('timer-circle').style.strokeDashoffset = 0;
 selectMode(2);
 buildLevelGrid();
+buildTimerSelect();
+buildFirstTurnSelect();
 </script>
 </body>
 </html>
